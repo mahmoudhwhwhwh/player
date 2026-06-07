@@ -52,23 +52,27 @@ text-align:center;
 
 <body>
 
-<div class="header">
-PLAYER
-</div>
+<div class="header">PLAYER</div>
 
-<div class="channels">
+<div class="channels" id="channels"></div>
 
-<div class="channel" onclick="play()">
-<img src="https://picsum.photos/300/200">
-<span>Channel 1</span>
-</div>
-
-</div>
+<script src="channels.js"></script>
 
 <script>
-function play(){
-location.href=
-"player.html?url=https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+const container = document.getElementById("channels");
+
+channels.forEach(ch => {
+container.innerHTML += `
+<div class="channel" onclick="play('${ch.url}')">
+<img src="${ch.logo}">
+<span>${ch.name}</span>
+</div>
+`;
+});
+
+function play(url){
+location.href =
+"player.html?url=" + encodeURIComponent(url);
 }
 </script>
 
