@@ -153,35 +153,24 @@ player.configure({
 // ★★★ الكود المُعدل والمُحسن يبدأ هنا ★★★  
 // ===============================================  
 
+// ... ابحث عن هذا الجزء داخل الكود واستبدله بـ:
 async function initializeApp() {  
-    // الخطوة 1: تعريف رابط البث والمفاتيح مباشرة هنا  
     const streamUrl = 'http://194.60.93.157/proxy?url=http://toytcl.xyz:8080/live//357643467990765/Ofgo3yz8CH/418113.m3u8';  
-    const clearKeys = {  
-        'e3ce77324a3d4fa2a913b26cc1976052': '17774f82a3b9e33ea7a149596acbb20f'  
-    };  
 
-    updateMuteButton();  
+    player.getNetworkingEngine().registerRequestFilter((type, request) => {
+        request.headers['Referer'] = 'http://toytcl.xyz/';
+        request.headers['Origin'] = 'http://toytcl.xyz';
+    });
 
     try {  
-        player.configure({  
-            drm: { clearKeys: clearKeys }  
-        });  
         await player.load(streamUrl);  
-
         elements.loadingSpinner.style.display = 'none';  
-        elements.video.play().catch(() => {  
-            console.log("Autoplay was blocked. Waiting for user interaction.");  
-            updatePlayButton();  
-        });  
-        showControls();  
+        elements.video.play();
     } catch (error) {  
-        let errorMessage = error.message;  
-        if (error.code && shaka.util.Error.Code[error.code]) {  
-            errorMessage = `قد يكون الرابط منتهي الصلاحية أو أن الخادم يرفض الطلب. (Shaka Error ${error.code})`;  
-        }  
-        showError('فشل تحميل البث', errorMessage);  
-    }  
-}  
+        showError('خطأ في التشغيل', error.message);  
+    }
+}
+
 
 // ===============================================  
 // ★★★ نهاية الكود المُعدل ★★★  
