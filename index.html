@@ -153,24 +153,35 @@ player.configure({
 // ★★★ الكود المُعدل والمُحسن يبدأ هنا ★★★  
 // ===============================================  
 
-// ... ابحث عن هذا الجزء داخل الكود واستبدله بـ:
 async function initializeApp() {  
-    const streamUrl = 'http://194.60.93.157/proxy?url=http://toytcl.xyz:8080/live//357643467990765/Ofgo3yz8CH/418113.m3u8';  
+    // الخطوة 1: تعريف رابط البث والمفاتيح مباشرة هنا  
+    const streamUrl = 'https://fastlyrwb-live.cdn.intigral-ott.net/STC/STC.isml/manifest.mpd';  
+    const clearKeys = {  
+        '47f0ab58f5a81c20b5b69dc494cbe102': '1e0719da653c2b4652f0b0bf84d96c74'  
+    };  
 
-    player.getNetworkingEngine().registerRequestFilter((type, request) => {
-        request.headers['Referer'] = 'http://toytcl.xyz/';
-        request.headers['Origin'] = 'http://toytcl.xyz';
-    });
+    updateMuteButton();  
 
     try {  
+        player.configure({  
+            drm: { clearKeys: clearKeys }  
+        });  
         await player.load(streamUrl);  
-        elements.loadingSpinner.style.display = 'none';  
-        elements.video.play();
-    } catch (error) {  
-        showError('خطأ في التشغيل', error.message);  
-    }
-}
 
+        elements.loadingSpinner.style.display = 'none';  
+        elements.video.play().catch(() => {  
+            console.log("Autoplay was blocked. Waiting for user interaction.");  
+            updatePlayButton();  
+        });  
+        showControls();  
+    } catch (error) {  
+        let errorMessage = error.message;  
+        if (error.code && shaka.util.Error.Code[error.code]) {  
+            errorMessage = `قد يكون الرابط منتهي الصلاحية أو أن الخادم يرفض الطلب. (Shaka Error ${error.code})`;  
+        }  
+        showError('فشل تحميل البث', errorMessage);  
+    }  
+}  
 
 // ===============================================  
 // ★★★ نهاية الكود المُعدل ★★★  
