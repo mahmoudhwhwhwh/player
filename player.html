@@ -155,10 +155,92 @@ player.configure({
 
 async function initializeApp() {  
     // الخطوة 1: تعريف رابط البث والمفاتيح مباشرة هنا  
-    const streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';  
-    const clearKeys = {  
-        '7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'  
-    };  
+    const params = new URLSearchParams(window.location.search);
+const channel = params.get('id');
+
+let streamUrl = '';
+let clearKeys = {};
+switch(channel){
+
+case 'max1':
+streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';
+clearKeys = {
+'7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'
+};
+break;
+
+case 'max2':
+streamUrl = 'ضع الرابط هنا';
+clearKeys = {};
+break;
+
+case 'max3':
+streamUrl = 'ضع الرابط هنا';
+clearKeys = {};
+break;
+
+case 'max4':
+streamUrl = 'ضع الرابط هنا';
+clearKeys = {};
+break;
+
+default:
+streamUrl = '';
+clearKeys = {};
+}
+async function initializeApp() {
+
+    const params = new URLSearchParams(window.location.search);
+    const channel = params.get('id');
+
+    let streamUrl = '';
+    let clearKeys = {};
+
+    switch(channel){
+
+        case 'max1':
+            streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';
+            clearKeys = {
+                '7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'
+            };
+            break;
+
+        case 'max2':
+            streamUrl = '...';
+            clearKeys = {};
+            break;
+
+        default:
+            streamUrl = '';
+            clearKeys = {};
+    }
+
+    // 🔴 هنا بالضبط تضيفه
+    if(!streamUrl){
+        showError("خطأ", "القناة غير موجودة");
+        return;
+    }
+
+    updateMuteButton();
+
+    try {
+        player.configure({
+            drm: { clearKeys: clearKeys }
+        });
+
+        await player.load(streamUrl);
+
+        elements.loadingSpinner.style.display = 'none';
+        elements.video.play().catch(() => {
+            updatePlayButton();
+        });
+
+        showControls();
+
+    } catch (error) {
+        showError('فشل تحميل البث', error.message);
+    }
+}
 
     updateMuteButton();  
 
