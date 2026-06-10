@@ -153,71 +153,39 @@ player.configure({
 // ★★★ الكود المُعدل والمُحسن يبدأ هنا ★★★  
 // ===============================================  
 
-async function initializeApp() {  
-    // الخطوة 1: تعريف رابط البث والمفاتيح مباشرة هنا  
-    const params = new URLSearchParams(window.location.search);
-const channel = params.get('id');
-
-let streamUrl = '';
-let clearKeys = {};
-switch(channel){
-
-case 'max1':
-streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';
-clearKeys = {
-'7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'
-};
-break;
-
-case 'max2':
-streamUrl = 'ضع الرابط هنا';
-clearKeys = {};
-break;
-
-case 'max3':
-streamUrl = 'ضع الرابط هنا';
-clearKeys = {};
-break;
-
-case 'max4':
-streamUrl = 'ضع الرابط هنا';
-clearKeys = {};
-break;
-
-default:
-streamUrl = '';
-clearKeys = {};
-}
-async function initializeApp() {
-
+ async function initializeApp() {
     const params = new URLSearchParams(window.location.search);
     const channel = params.get('id');
 
     let streamUrl = '';
     let clearKeys = {};
 
-    switch(channel){
-
+    switch (channel) {
         case 'max1':
             streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';
             clearKeys = {
                 '7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'
             };
             break;
-
         case 'max2':
-            streamUrl = '...';
+            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
             clearKeys = {};
             break;
-
+        case 'max3':
+            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+            clearKeys = {};
+            break;
+        case 'max4':
+            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+            clearKeys = {};
+            break;
         default:
             streamUrl = '';
             clearKeys = {};
     }
 
-    // 🔴 هنا بالضبط تضيفه
-    if(!streamUrl){
-        showError("خطأ", "القناة غير موجودة");
+    if (!streamUrl) {
+        showError("Error", "Channel not found");
         return;
     }
 
@@ -225,7 +193,9 @@ async function initializeApp() {
 
     try {
         player.configure({
-            drm: { clearKeys: clearKeys }
+            drm: {
+                clearKeys: clearKeys
+            }
         });
 
         await player.load(streamUrl);
@@ -238,32 +208,14 @@ async function initializeApp() {
         showControls();
 
     } catch (error) {
-        showError('فشل تحميل البث', error.message);
+        let errorMessage = error.message;
+        if (error.code && shaka.util.Error.Code[error.code]) {
+            errorMessage = `Playback failed. (Shaka Error ${error.code})`;
+        }
+        showError('Playback Error', errorMessage);
     }
 }
-
-    updateMuteButton();  
-
-    try {  
-        player.configure({  
-            drm: { clearKeys: clearKeys }  
-        });  
-        await player.load(streamUrl);  
-
-        elements.loadingSpinner.style.display = 'none';  
-        elements.video.play().catch(() => {  
-            console.log("Autoplay was blocked. Waiting for user interaction.");  
-            updatePlayButton();  
-        });  
-        showControls();  
-    } catch (error) {  
-        let errorMessage = error.message;  
-        if (error.code && shaka.util.Error.Code[error.code]) {  
-            errorMessage = `قد يكون الرابط منتهي الصلاحية أو أن الخادم يرفض الطلب. (Shaka Error ${error.code})`;  
-        }  
-        showError('فشل تحميل البث', errorMessage);  
-    }  
-}  
+ 
 
 // ===============================================  
 // ★★★ نهاية الكود المُعدل ★★★  
