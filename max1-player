@@ -155,7 +155,7 @@ player.configure({
 
 async function initializeApp() {  
     // الخطوة 1: تعريف رابط البث والمفاتيح مباشرة هنا  
-    const streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';  
+    const streamUrl = 'http://45.67.56.78/Sport1/index.fmp4.m3u8';  
     const clearKeys = {  
         '7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'  
     };  
