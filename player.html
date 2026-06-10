@@ -1,272 +1,120 @@
-<!DOCTYPE html>  <html dir='rtl' lang='ar'>  
-<head>  
-<meta charset='UTF-8'/>  
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-<title>$*&</title>  
-<link rel="shortcut icon" href="#*&" />  
-<meta name="referrer" content="no-referrer" />  
-<link rel="preconnect" href="https://fonts.googleapis.com">  
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>  
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">  
-<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.13/shaka-player.compiled.js"></script>  
-<style>  
-#close_mando { left: 8px; top: 8px; position: absolute; width: 30px; /* تكبير عرض الزر */ height: 30px; /* تكبير ارتفاع الزر */ line-height: 30px; /* محاذاة النص داخل الزر */ font-size: 20px; /* تكبير حجم الخط */ background: #e84118; color: white; border: none; border-radius: 50%; cursor: pointer; z-index: 1000; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }  
-#close_mando:hover { background: #c23616; transform: scale(1.1); }  
-#ad_bolk { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 250px; /* تصغير العرض */ height: 180px; /* تصغير الارتفاع */ background: linear-gradient(135deg, #1a202c, #13192E); border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; z-index: 999999; border: 1px solid #444; animation: fadeIn 0.5s ease-out; padding-top: 13px; }  
-#ad_contentz { width: 85%; height: calc( 100% - 1px); /* تخصيص ارتفاع الإطار لتناسب الحجم الجديد */ border: none; }  
-@keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }  
-@keyframes fadeOut { from { opacity: 1; transform: translate(-50%, -50%); } to { opacity: 0; transform: translate(-50%, -55%); } }  
-.fade-out { animation: fadeOut 0.3s ease-in forwards; }  
-</style>   <style>  
-:root { --primary-color: #D80404; --live-color: #e62e2e; --menu-bg: #282828; }  
-body, html { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: 'Tajawal', sans-serif !important; -webkit-tap-highlight-color: transparent; }  
-#player-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }  
-#video-wrapper { position: relative; width: 100%; height: 100%; z-index: 1; }  
-#video { width: 100%; height: 100%; object-fit: contain; }  
-#loading-spinner { width: 60px; height: 60px; border: 5px solid rgba(255, 255, 255, 0.2); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; position: absolute; z-index: 100; display: block; }  
-@keyframes spin { to { transform: rotate(360deg); } }  
-#error-overlay { position: absolute; z-index: 100; inset: 0; background-color: rgba(0,0,0,0.9); color: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }  
-#error-overlay i { width: 48px; height: 48px; margin-bottom: 20px; color: var(--live-color); }  
-.controls-overlay { position: absolute; z-index: 10; transition: opacity 0.3s, visibility 0.3s; opacity: 0; visibility: hidden; pointer-events: none; }  
-.controls-overlay.visible { opacity: 1; visibility: visible; pointer-events: auto; }  
-#bottom-controls-container { bottom: 0; left: 0; right: 0; padding: 5px 15px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }  
-#center-controls { top: 50%; left: 50%; transform: translate(-50%, -50%); }  
-.center-controls-cluster { display: flex; align-items: center; gap: 40px; background-color: rgba(0,0,0,0.2); padding: 10px 20px; border-radius: 50px; }  
-.control-button, .center-control-button { background: none; border: none; color: #fff; cursor: pointer; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; transition: all 0.2s ease; }  
-.control-button:hover, .center-control-button:hover { color: var(--primary-color); transform: scale(1.1); }  
-.control-button i, .control-button svg { width: 24px; height: 24px; }  
-.center-control-button i { width: 42px; height: 42px; filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.8)); }  
-.center-seek-button i { width: 32px; height: 32px; }  
-.progress-bar-container { width: 100%; padding: 10px 0; cursor: default; }  
-.progress-bar { width: 100%; height: 5px; background-color: rgba(255, 255, 255, 0.3); border-radius: 2.5px; }  
-.progress-played { width: 100%; height: 100%; background-color: var(--primary-color); border-radius: 2.5px; }  
-.progress-played::after { display: none; }  
-.bottom-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; }  
-.controls-left, .controls-right { display: flex; align-items: center; gap: 15px; }  
-#time-display-container { color: #fff; font-size: 0.9em; font-weight: 500; min-width: 50px; text-align: center; }  
-#settings-popup { position: absolute; bottom: 80px; width: 260px; background-color: var(--menu-bg); border-radius: 8px; z-index: 20; display: none; box-shadow: 0 0 20px rgba(0,0,0,0.5); border: 1px solid rgba(255, 255, 255, 0.1); }  
-#settings-list { list-style:none; padding: 8px; margin:0; overflow-y: auto; max-height: 220px; }  
-.settings-header { display: flex; justify-content: space-between; align-items: center; padding: 5px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }  
-.settings-title { color: #ccc; font-weight: 700; }  
-.settings-close-btn, .settings-back-btn { cursor: pointer; color: #ccc; padding: 5px; }  
-.settings-close-btn:hover, .settings-back-btn:hover { color: #fff; }  
-.menu-item { display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding: 12px 10px; border-radius: 5px; cursor: pointer; font-weight: 500; color: #fff; transition: background-color 0.2s ease; }  
-.menu-item:hover { background-color: rgba(255, 255, 255, 0.1); }  
-.menu-item.active { color: var(--primary-color); font-weight: 700; }  
-.menu-item .checkmark { width: 20px; height: 20px; visibility: hidden; }  
-.menu-item.active .checkmark { visibility: visible; }  
-.menu-item-bitrate, .menu-item-value { font-size: 0.9em; color: #aaa; margin-left: auto; }  
-#player-logo, #telegram-link { position: absolute; z-index: 9; opacity: 0.8; transition: all 0.3s ease; }  
-#player-logo { bottom: 30px; right: 15px; height: 60px; }  
-#telegram-link { top: 18px; right: 18px; color: #fff; }  
-#player-logo:hover, #telegram-link:hover { opacity: 1; }  
-#telegram-link:hover { transform: scale(1.15); color: #2AABEE; }  
-#player-logo img { height: 100%; width: auto; }  
-</style>  </head>  
-<body>  
-<div id="player-container">  
-<div id="loading-spinner"></div>  
-<div id="error-overlay">  
-<i data-feather="alert-triangle"></i>  
-<h3 id="error-title">فشل تحميل البث</h3>  
-<p id="error-message">قد يكون البث متوقف حالياً أو توجد مشكلة في الشبكة.</p>  
-</div>  
-<div id="video-wrapper">  
-<video autoplay unmuted data-shaka-player poster="live strem pro " id='video' style='width:100%;height:100%;object-fit: fill !important;'></video>  
-</div>  
-<a id="player-logo" href="#$$" target="_blank">  
-<img src="https://iili.io/C30jBHX.png" alt="live strem pro ">  
-</a>  
-<a id="telegram-link" href="هنا  يتم وضع رابط  تلكرام " target="_blank" title="انضم لنا"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></a>  
-<div id="settings-popup">  
-<div class="settings-header">  
-<span class="settings-back-btn" style="display: none;"><i data-feather="arrow-right"></i></span>  
-<span class="settings-title">الإعدادات</span>  
-<span class="settings-close-btn"><i data-feather="x"></i></span>  
-</div>  
-<ul id="settings-list"></ul>  
-</div>  
-<div id="center-controls" class="controls-overlay">  
-<div class="center-controls-cluster">  
-<button class="control-button center-seek-button" id="seek-forward-btn" title="تقديم 10 ثواني"><i data-feather="fast-forward"></i></button>  
-<button class="center-control-button" id="play-pause-center-btn" title="تشغيل/إيقاف"><i data-feather="play"></i></button>  
-<button class="control-button center-seek-button" id="seek-backward-btn" title="رجوع 10 ثواني"><i data-feather="rewind"></i></button>  
-</div>  
-</div>  
-<div id="bottom-controls-container" class="controls-overlay">  
-<div class="progress-bar-container"><div class="progress-bar"><div class="progress-played"></div></div></div>  
-<div class="bottom-controls">  
-<div class="controls-left">  
-<button class="control-button" id="fullscreen-btn" title="ملء الشاشة"><i data-feather="maximize"></i></button>  
-<button id="settings-btn" class="control-button" title="الإعدادات"><i data-feather="settings"></i></button>  
-<button class="control-button" id="expand-btn" title="تغيير وضع العرض"></button>  
-</div>  
-<div class="controls-right">  
-<div id="time-display-container">00:00</div>  
-<button class="control-button" id="mute-btn" title="كتم الصوت"><i data-feather="volume-2"></i></button>  
-<button class="control-button" id="play-pause-btn" title="تشغيل/إيقاف"><i data-feather="play"></i></button>  
-</div>  
-</div>  
-</div>  
-</div>  
-<script>  
-document.addEventListener('DOMContentLoaded', () => {  
-    const expandSvg = `<svg fill="currentColor" version="1.1" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 100 100"><g><path d="M22.661,20.5H36c1.104,0,2-0.896,2-2s-0.896-2-2-2H19c-1.104,0-2.5,1.276-2.5,2.381v17c0,1.104,0.896,2,2,2s2-0.896,2-2V24.876l16.042,15.791c0.391,0.391,1.027,0.586,1.539,0.586s1.086-0.195,1.477-0.586c0.781-0.781,0.812-2.237,0.031-3.019L22.661,20.5z"></path><path d="M83,16.5H66c-1.104,0-2,0.896,2,2s0.896,2,2,2h12.605L61.647,37.648c-0.781,0.781-0.781,2.142,0,2.923c0.39,0.391,0.902,0.633,1.414,0.633s0.774-0.171,1.164-0.562l16.274-16.5v11.738c0,1.104,0.896,2,2,2s2-0.896,2-2v-17C84.5,17.776,84.104,16.5,83,16.5z"></path><path d="M36.542,60.962L20.5,76.754V65.881c0-1.104-0.896-2-2-2s-2,0.896,2,2v17c0,1.104,1.396,1.619,2.5,1.619h17c1.104,0,2-0.896,2-2s-0.896-2-2-2H22.529L39.62,63.6c0.781-0.781,0.656-1.951-0.125-2.732C38.715,60.086,37.322,60.181,36.542,60.962z"></path><path d="M82.5,63.881c-1.104,0-2,0.896-2,2v11.606L64.226,60.962c-0.78-0.781-1.923-0.781-2.703,0c-0.781,0.781-0.719,1.856,0.062,2.638l17.152,16.9H66c-1.104,0-2,0.896-2,2s0.896,2,2,2h17c1.104,0,1.5-0.515,1.5-1.619v-17C84.5,64.776,83.604,63.881,82.5,63.881z"></path></g></svg>`;  
-    const elements = {  
-        video: document.getElementById('video'),  
-        playerContainer: document.getElementById('player-container'),  
-        centerControls: document.getElementById('center-controls'),  
-        bottomControls: document.getElementById('bottom-controls-container'),  
-        playPauseBtn: document.getElementById('play-pause-btn'),  
-        playPauseCenterBtn: document.getElementById('play-pause-center-btn'),  
-        muteBtn: document.getElementById('mute-btn'),  
-        fullscreenBtn: document.getElementById('fullscreen-btn'),  
-        timeDisplay: document.getElementById('time-display-container'),  
-        progressPlayed: document.querySelector('.progress-played'),  
-        progressBarContainer: document.querySelector('.progress-bar-container'),  
-        settingsBtn: document.getElementById('settings-btn'),  
-        settingsPopup: document.getElementById('settings-popup'),  
-        settingsList: document.getElementById('settings-list'),  
-        settingsTitle: document.querySelector('.settings-title'),  
-        settingsBackBtn: document.querySelector('.settings-back-btn'),  
-        settingsCloseBtn: document.querySelector('.settings-close-btn'),  
-        loadingSpinner: document.getElementById('loading-spinner'),  
-        errorOverlay: document.getElementById('error-overlay'),  
-        errorTitle: document.getElementById('error-title'),  
-        errorMessage: document.getElementById('error-message'),  
-        seekBackwardBtn: document.getElementById('seek-backward-btn'),  
-        seekForwardBtn: document.getElementById('seek-forward-btn'),  
-        expandBtn: document.getElementById('expand-btn'),  
-    };  let controlsTimeout, clickTimer, expandModeIndex = 0;  
-const expandModes = ['contain', 'cover', 'fill'];  
-elements.expandBtn.innerHTML = expandSvg;  
-  
-const player = new shaka.Player(elements.video);  
-player.configure({  
-    manifest: { dash: { ignoreMinBufferTime: true } },  
-    streaming: { rebufferingGoal: 2, bufferingGoal: 10, alwaysStreamText: true },  
-    abr: { defaultBandwidthEstimate: 3000000, enabled: true }  
-});  
-  
-// ===============================================  
-// ★★★ الكود المُعدل والمُحسن يبدأ هنا ★★★  
-// ===============================================  
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>live strem pro</title>
+<style>
+:root{--bg:#140022;--text:#fff;--border:#6d00c4;}
+body{margin:0;font-family:Tahoma,sans-serif;background:var(--bg);color:var(--text);}
+header{padding:20px;text-align:center;font-weight:bold;font-size:20px;background:rgba(0,0,0,0.2);}
+.slider-container{height:180px;position:relative;overflow:hidden;margin:10px;border-radius:20px;border:2px solid var(--border);}
+.slider-slide{position:absolute;width:100%;height:100%;opacity:0;transition:1s;}
+.slider-slide.active{opacity:1;}
+.slider-slide img{width:100%;height:100%;object-fit:cover;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:15px;}
+.box{background:#000;border:2px solid var(--border);border-radius:20px;padding:10px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;}
+.box img{width:60px;height:60px;object-fit:contain;}
+.box-name{font-size:11px;font-weight:bold;margin-top:8px;}
+.channels{display:none;padding:15px;}
+.back{padding:12px;margin-bottom:15px;border-radius:10px;background:var(--border);text-align:center;cursor:pointer;font-weight:bold;}
+.chan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.channel{background:#000;border:2px solid var(--border);border-radius:20px;overflow:hidden;text-align:center;cursor:pointer;text-decoration:none;display:block;}
+.logo-area{height:100px;display:flex;justify-content:center;align-items:center;}
+.logo-frame{width:70px;height:70px;border:2px solid var(--border);border-radius:15px;display:flex;justify-content:center;align-items:center;background:#fff;}
+.logo-frame img{width:50px;height:50px;object-fit:contain;}
+.channel-name{background:#1a1a1a;padding:8px;font-size:10px;font-weight:bold;color:#fff;}
+</style>
+</head>
+<body>
 
- async function initializeApp() {
-    const params = new URLSearchParams(window.location.search);
-    const channel = params.get('id');
+<header>live strem pro</header>
 
-    let streamUrl = '';
-    let clearKeys = {};
+<div class="slider-container">
+    <div class="slider-slide active"><img src="https://iili.io/KHsnsyJ.jpg"></div>
+    <div class="slider-slide"><img src="https://iili.io/BsK4nlp.png"></div>
+    <div class="slider-slide"><img src="https://iili.io/BsK6ahg.png"></div>
+    <div class="slider-slide"><img src="https://iili.io/BsKPVPj.png"></div>
+    <div class="slider-slide"><img src="https://iili.io/BsKiSm7.png"></div>
+    <div class="slider-slide"><img src="https://iili.io/BsKsXyB.png"></div>
+</div>
 
-    switch (channel) {
-        case 'max1':
-            streamUrl = 'http://45.67.56.78/Sport2/index.fmp4.m3u8';
-            clearKeys = {
-                '7e9239c1982d984a002df3ed049d0756': '1b8a17598129a3618535c8fb05f103fe'
-            };
-            break;
-        case 'max2':
-            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
-            clearKeys = {};
-            break;
-        case 'max3':
-            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
-            clearKeys = {};
-            break;
-        case 'max4':
-            streamUrl = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
-            clearKeys = {};
-            break;
-        default:
-            streamUrl = '';
-            clearKeys = {};
-    }
+<div id="sections" class="grid">
+    <div class="box" onclick="openSection('MBC')"><img src="https://iili.io/CfZ046X.jpg"><div class="box-name">MBC</div></div>
+    <div class="box" onclick="openSection('bein')"><img src="https://iili.io/CK5W75J.jpg"><div class="box-name">beIN SPORTS</div></div>
+    <div class="box" onclick="openSection('VIP')"><img src="https://iili.io/CK5M0pR.png"><div class="box-name">VIP</div></div>
+     <div class="box" onclick="openSection('live strem low')"><img src="https://iili.io/CK5M0pR.png"><div class="box-name">sports 1 low</div></div>
+     <div class="box" onclick="openSection('live strem HD')"><img src="https://iili.io/CK5M0pR.png"><div class="box-name">Sports 2 HD</div></div>
+     <div class="box" onclick="openSection('live strem FHD')"><img src="https://iili.io/CK5M0pR.png"><div class="box-name">Sports 3 FHD</div></div>
+    <div class="box" onclick="openSection('Alkass')"><img src="https://iili.io/CKMJBjf.png"><div class="box-name">Alkass</div></div>
+    <div class="box" onclick="openSection('Alwan')"><img src="https://iili.io/CKGvbzx.png"><div class="box-name">Alwan</div></div>
+    <div class="box" onclick="openSection('Eight')"><img src="https://iili.io/CKGPu6v.png"><div class="box-name">Eight</div></div>
+    <div class="box" onclick="openSection('Shahid')"><img src="https://iili.io/CKMTUSs.jpg"><div class="box-name">Shahid sports</div></div>
+    <div class="box" onclick="openSection('OSTORA TV')"><img src="https://iili.io/CKMvRBp.png"><div class="box-name">OSTORA Sports</div></div>
+    <div class="box" onclick="openSection('STC')"><img src="https://iili.io/Cf0Rhp1.jpg"><div class="box-name">STC sports </div></div>
+    <div class="box" onclick="openSection('World Cup VIP')"><img src="https://iili.io/CB2ge6l.png"><div class="box-name">World Cup VIP</div></div>
+    <div class="box" onclick="openSection('World Cup')"><img src="https://iili.io/CB2ge6l.png"><div class="box-name">World Cup</div></div>
+    <div class="box" onclick="openSection('Starz Play')"><img src="https://iili.io/Cf02bDP.jpg"><div class="box-name">Starz Play sport </div></div>
+</div>
 
-    if (!streamUrl) {
-        showError("Error", "Channel not found");
-        return;
-    }
+<div id="channels" class="channels">
+    <div class="back" onclick="back()">⬅ رجوع</div>
+    <div id="list" class="chan-grid"></div>
+</div>
 
-    updateMuteButton();
+<script>
+const data = {
+   MBC: [{n:"MBC_1", u:"go:m1", i:"https://iili.io/CK7B3G9.png"}, {n:"MBC_2", u:"go:m2", i:"https://iili.io/CfZjicN.png"}, {n:"MBC_3", u:"go:m3", i:"https://iili.io/CfZw6zu.png"}, {n:"MBC_4", u:"go:m4", i:"https://iili.io/CfZO3Zu.png"},{n:"MBC_5", u:"go:m5", i:"https://iili.io/CfZeZg4.png"},{n:"MBC_MASR_1", u:"go:m6", i:"https://iili.io/CK7zZ4S.png"},{n:"MBC_MASR_2", u:"go:m7", i:"https://iili.io/CK7IN9e.png"},{n:"MBC _IRAQ", u:"go:m8", i:"https://iili.io/CK7T9St.png"},{n:"MBC_ Drama", u:"go:m9", i:"https://iili.io/CK7TGOg.png"},{n:"MBC_ACTION", u:"go:m10", i:"https://iili.io/CK7AB87.png"},],
+    bein: [{n:"beIN 1", u:"go:b1", i:"https://iili.io/CK75BIe.png"}, {n:"beIN 2", u:"go:b2", i:"https://iili.io/CK75iZu.png"}, {n:"beIN 3", u:"go:b3", i:"https://iili.io/CK77jSV.png"}, {n:"beIN 4", u:"go:b4", i:"https://iili.io/CK7c6Ux.png"},{n:"beIN 5", u:"go:b5", i:"https://iili.io/CK7lc0b.png"},{n:"beIN 6", u:"go:b6", i:"https://iili.io/CK7l4LX.png"},{n:"beIN 7", u:"go:b7", i:"https://iili.io/CK70fpV.png"},{n:"beIN 8", u:"go:b8", i:"https://iili.io/CK71FPn.png"},{n:"beIN 9", u:"go:b9", i:"https://iili.io/CK70Wv4.png"},{n:"beIN News", u:"go:bN", i:"https://iili.io/CK71GoP.png"},{n:"beIN HD", u:"go:bH", i:"https://iili.io/CK71iJf.png"},],
+    VIP: [{n:"beIN 1", u:"go:s1", i:"https://iili.io/CK75BIe.png"}, {n:"beIN 2", u:"go:s2", i:"https://iili.io/CK75iZu.png"}, {n:"beIN 3", u:"go:s3", i:"https://iili.io/CK77jSV.png"}, {n:"beIN 4", u:"go:s4", i:"https://iili.io/CK7c6Ux.png"},{n:"beIN 5", u:"go:s5", i:"https://iili.io/CK7lc0b.png"},{n:"beIN 6", u:"go:s6", i:"https://iili.io/CK7l4LX.png"},{n:"beIN 7", u:"go:s7", i:"https://iili.io/CK70fpV.png"},{n:"beIN 8", u:"go:s8", i:"https://iili.io/CK71FPn.png"},{n:"beIN 9", u:"go:s9", i:"https://iili.io/CK70Wv4.png"},{n:"beIN News", u:"go:s10", i:"https://iili.io/CK71GoP.png"},{n:"beIN HD", u:"go:s11", i:"https://iili.io/CK71iJf.png"},],
+     "live strem low": [{n:"beIN 1", u:"go:bL1", i:"https://iili.io/CK75BIe.png"}, {n:"beIN 2", u:"go:bL2", i:"https://iili.io/CK75iZu.png"}, {n:"beIN 3", u:"go:bL3", i:"https://iili.io/CK77jSV.png"}, {n:"beIN 4", u:"go:bL4", i:"https://iili.io/CK7c6Ux.png"},{n:"beIN 5", u:"go:bL5", i:"https://iili.io/CK7lc0b.png"},{n:"beIN 6", u:"go:bL6", i:"https://iili.io/CK7l4LX.png"}],
+      "live strem HD": [{n:"beIN 1", u:"go:bH1", i:"https://iili.io/CK75BIe.png"}, {n:"beIN 2", u:"go:bH2", i:"https://iili.io/CK75iZu.png"}, {n:"beIN 3", u:"go:bH3", i:"https://iili.io/CK77jSV.png"}, {n:"beIN 4", u:"go:bH4", i:"https://iili.io/CK7c6Ux.png"},{n:"beIN 5", u:"go:bH5", i:"https://iili.io/CK7lc0b.png"},{n:"beIN 6", u:"go:bH6", i:"https://iili.io/CK7l4LX.png"}],
+       "live strem FHD": [{n:"beIN 1", u:"go:bF1", i:"https://iili.io/CK75BIe.png"}, {n:"beIN 2", u:"go:F2", i:"https://iili.io/CK75iZu.png"}, {n:"beIN 3", u:"go:bF3", i:"https://iili.io/CK77jSV.png"}, {n:"beIN 4", u:"go:bF4", i:"https://iili.io/CK7c6Ux.png"},{n:"beIN 5", u:"go:bF5", i:"https://iili.io/CK7lc0b.png"},{n:"beIN 6", u:"go:bF6", i:"https://iili.io/CK7l4LX.png"}],
+   Alkass : [{n:"Alkass 1", u:"go:Al1", i:"https://iili.io/CKMJBjf.png"}, {n:"Alkass 2", u:"go:Al2", i:"https://iili.io/CKMJBjf.png"}, {n:"Alkass 3", u:"go:Al3", i:"https://iili.io/CKMJBjf.png"}, {n:"Alkass 4", u:"go:Al4", i:"https://iili.io/CKMJBjf.png"},{n:"Alkass 5", u:"go:Al5", i:"https://iili.io/CKMJBjf.png"},{n:"Alkass 6", u:"go:Al6", i:"https://iili.io/CKMJBjf.png"}], 
+    Eight : [{n:"ثمانيه 1", u:"go:E1", i:"https://iili.io/CKGia0x.png"}, {n:"ثمانيه 2", u:"go:E2", i:"https://iili.io/CKGsqI1.png"}, {n:"ثمانيه 3", u:"go:E3", i:"https://iili.io/CKGsQ6J.png"}],
+    Alwan: [{n:"Alwan 1", u:"go:A1", i:"https://iili.io/CKGvbzx.png"}, {n:"Alwan 2", u:"go:A2", i:"https://iili.io/CKGvbzx.png"}, {n:"Alwan 3", u:"go:A3", i:"https://iili.io/CKGvbzx.png"}, {n:"Alwan 4", u:"go:A4", i:"https://iili.io/CKGvbzx.png"},{n:"Alwan 5", u:"go:A5", i:"https://iili.io/CKGvbzx.png"},{n:"Alwan 6", u:"go:A6", i:"https://iili.io/CKGvbzx.png"}],
+Shahid : [{n:"Shahid 1", u:"go:Sh1", i:"https://iili.io/CKMTUSs.jpg"}, {n:"Shahid 2", u:"go:Sh2", i:"https://iili.io/CKMTUSs.jpg"}, {n:"Shahid 3", u:"go:Sh3", i:"https://iili.io/CKMTUSs.jpg"}],
+    "OSTORA TV": [{n:"OSTORA 1", u:"go:OS1", i:"https://iili.io/CKMvRBp.png"}, {n:"OSTORA 2", u:"go:OS2", i:"https://iili.io/CKMvRBp.png"}, {n:"OSTORA 3", u:"go:OS3", i:"https://iili.io/CKMvRBp.png"}, {n:"OSTORA 4", u:"go:OS4", i:"https://iili.io/CKMvRBp.png"},{n:"OSTORA 5", u:"go:OS5", i:"https://iili.io/CKMvRBp.png"},{n:"OSTORA 6", u:"go:OS6", i:"https://iili.io/CKMvRBp.png"},{n:"OSTORA 7", u:"go:OS7", i:"https://iili.io/CKMvRBp.png"},{n:"OSTORA 8", u:"go:OS8", i:"https://iili.io/CKMvRBp.png"},{n:"OSTORA 9", u:"go:OS9", i:"https://iili.io/CKMvRBp.png"}],
+    STC: [{n:"STC sports _1", u:"go:stc1", i:"https://iili.io/Cf0Rhp1.jpg"}, {n:"STC sports _2", u:"go:stc2", i:"https://iili.io/Cf0Rhp1.jpg"}, {n:"STC sports _3", u:"go:stc3", i:"https://iili.io/Cf0Rhp1.jpg"}], 
+   "World Cup VIP": [{n:"MAX 1", u:"go:MAX1", i:"https://iili.io/CB24mQa.png"}, {n:"MAX 2", u:"go:MAX2", i:"https://iili.io/CB26uvS.png"}, {n:"MAX 3", u:"go:MAX3", i:"https://iili.io/CB26VyP.png"}, {n:"MAX 4", u:"go:MAX4", i:"https://iili.io/CB26vFR.png"}],
+    "World Cup VIP": [
+ {n:"MAX 1", u:"player.html?id=max1", i:"https://iili.io/CB24mQa.png"},
+ {n:"MAX 2", u:"player.html?id=max2", i:"https://iili.io/CB26uvS.png"},
+ {n:"MAX 3", u:"player.html?id=max3", i:"https://iili.io/CB26VyP.png"},
+ {n:"MAX 4", u:"player.html?id=max4", i:"https://iili.io/CB26vFR.png"}
+],
+"Starz Play": [
+    {n:"Starz Play_1", u:"go:star1", i:"https://iili.io/Cf02bDP.jpg"},
+    {n:"Starz Play_2", u:"go:star2", i:"https://iili.io/Cf02bDP.jpg"},
+    {n:"Starz Play_3", u:"go:star3", i:"https://iili.io/Cf02bDP.jpg"}
+]
+};
 
-    try {
-        player.configure({
-            drm: {
-                clearKeys: clearKeys
-            }
+function openSection(name){
+    document.getElementById("sections").style.display="none";
+    document.getElementById("channels").style.display="block";
+    let list=document.getElementById("list");
+    list.innerHTML="";
+    if(data[name]) {
+        data[name].forEach(c=>{
+            list.innerHTML+=`<a href="${c.u}" class="channel">
+                <div class="logo-area"><div class="logo-frame"><img src="${c.i}"></div></div>
+                <div class="channel-name">${c.n}</div>
+            </a>`;
         });
-
-        await player.load(streamUrl);
-
-        elements.loadingSpinner.style.display = 'none';
-        elements.video.play().catch(() => {
-            updatePlayButton();
-        });
-
-        showControls();
-
-    } catch (error) {
-        let errorMessage = error.message;
-        if (error.code && shaka.util.Error.Code[error.code]) {
-            errorMessage = `Playback failed. (Shaka Error ${error.code})`;
-        }
-        showError('Playback Error', errorMessage);
     }
 }
- 
-
-// ===============================================  
-// ★★★ نهاية الكود المُعدل ★★★  
-// ===============================================  
-
-function showError(title, message) {  
-    elements.loadingSpinner.style.display = 'none';  
-    elements.errorTitle.textContent = title;  
-    elements.errorMessage.textContent = message;  
-    elements.errorOverlay.style.display = 'flex';  
-    feather.replace();  
-}  
-const showControls = () => {[elements.bottomControls, elements.centerControls].forEach(el => el.classList.add('visible')); clearTimeout(controlsTimeout); if (!elements.video.paused) { controlsTimeout = setTimeout(hideControls, 4000); }};  
-const hideControls = () => { if (elements.settingsPopup.style.display === 'block') return; [elements.bottomControls, elements.centerControls].forEach(el => el.classList.remove('visible')); };  
-const togglePlay = () => elements.video.paused ? elements.video.play() : elements.video.pause();  
-const updatePlayButton = () => {const icon = elements.video.paused ? 'play' : 'pause'; elements.playPauseBtn.innerHTML = `<i data-feather="${icon}"></i>`; elements.playPauseCenterBtn.innerHTML = `<i data-feather="${icon}"></i>`; feather.replace();};  
-function updateMuteButton() { const icon = elements.video.muted || elements.video.volume === 0 ? 'volume-x' : (elements.video.volume < 0.5 ? 'volume-1' : 'volume-2'); elements.muteBtn.innerHTML = `<i data-feather="${icon}"></i>`; feather.replace(); }  
-async function toggleFullscreen() {if (!document.fullscreenElement) {await elements.playerContainer.requestFullscreen();} else {await document.exitFullscreen();}}  
-function updateFullscreenIcon() {elements.fullscreenBtn.innerHTML = `<i data-feather="${document.fullscreenElement ? 'minimize' : 'maximize'}"></i>`; feather.replace();}  
-const formatTime = (timeInSeconds) => {if (isNaN(timeInSeconds) || timeInSeconds < 0) return '00:00'; const date = new Date(null); date.setSeconds(timeInSeconds); return date.toISOString().substr(14, 5);};  
-const toggleSettingsPopup = () => { clearTimeout(controlsTimeout); const popup = elements.settingsPopup; if (popup.style.display === 'block') { popup.style.display = 'none'; } else { popup.style.visibility = 'hidden'; popup.style.display = 'block'; const buttonRect = elements.settingsBtn.getBoundingClientRect(), containerRect = elements.playerContainer.getBoundingClientRect(), popupWidth = popup.offsetWidth; let popupLeft = buttonRect.left + (buttonRect.width / 2) - (popupWidth / 2); if (popupLeft < 10) popupLeft = 10; if (popupLeft + popupWidth > containerRect.width - 10) popupLeft = containerRect.width - popupWidth - 10; popup.style.left = `${popupLeft}px`; popup.style.right = 'auto'; popup.style.visibility = 'visible'; showMainMenu(); } };  
-const showMainMenu = () => { const list = elements.settingsList; list.innerHTML = ''; elements.settingsTitle.textContent = 'الإعدادات'; elements.settingsBackBtn.style.display = 'none'; const qualityValue = player.getConfiguration().abr.enabled ? 'تلقائي' : `${player.getVariantTracks().find(t=>t.active)?.height}p`; list.appendChild(createMenuItem('الجودة', 'sliders', () => showSubMenu('quality'), qualityValue)); if (player.getAudioLanguagesAndRoles().length > 1) { const audioValue = player.getAudioLanguages()[0].toLowerCase() === 'ar' ? 'العربية' : 'الإنجليزية'; list.appendChild(createMenuItem('الصوت', 'headphones', () => showSubMenu('audio'), audioValue)); } if (!player.isLive()) { const speedValue = player.getPlaybackRate() === 1 ? 'عادي' : `${player.getPlaybackRate()}x`; list.appendChild(createMenuItem('السرعة', 'play-circle', () => showSubMenu('speed'), speedValue)); } feather.replace(); };  
-const showSubMenu = (type) => { const list = elements.settingsList; list.innerHTML = ''; elements.settingsBackBtn.style.display = 'block'; switch (type) { case 'quality': elements.settingsTitle.textContent = 'الجودة'; const isAbrEnabled = player.getConfiguration().abr.enabled, tracks = player.getVariantTracks().filter(t => t.type === 'variant'), activeTrack = tracks.find(t => t.active); list.appendChild(createSubMenuItem('تلقائي', isAbrEnabled, () => { player.configure('abr.enabled', true); toggleSettingsPopup(); })); [...new Set(tracks.map(t => t.height))].filter(Boolean).sort((a,b)=>b-a).forEach(h => { const trackForHeight = tracks.find(t => t.height === h), bitrate = `(${Math.round(trackForHeight.bandwidth / 1000)} kbps)`; list.appendChild(createSubMenuItem(`${h}p`, !isAbrEnabled && activeTrack && activeTrack.height === h, () => { player.configure('abr.enabled', false); player.selectVariantTrack(trackForHeight, true); toggleSettingsPopup(); }, bitrate)); }); break; case 'audio': elements.settingsTitle.textContent = 'الصوت'; const currentAudioLang = player.getAudioLanguages()[0]; player.getAudioLanguagesAndRoles().forEach(track => { const langName = track.language.toLowerCase() === 'ar' ? 'العربية' : 'الإنجليزية'; list.appendChild(createSubMenuItem(langName, track.language === currentAudioLang, () => { player.selectAudioLanguage(track.language, track.role); })); }); break; case 'speed': elements.settingsTitle.textContent = 'السرعة'; const currentRate = player.getPlaybackRate(); [0.5, 0.75, 1, 1.25, 1.5, 2].forEach(rate => { list.appendChild(createSubMenuItem(rate === 1 ? 'عادي' : `${rate}x`, rate === currentRate, () => { player.setPlaybackRate(rate); showMainMenu(); })); }); break; } feather.replace(); };  
-function createMenuItem(title, icon, action, value) { const item = document.createElement('li'); item.className = 'menu-item'; item.innerHTML = `<i data-feather="${icon}"></i> <span>${title}</span> <span class="menu-item-value">${value}</span>`; item.onclick = action; return item; }  
-function createSubMenuItem(title, isActive, action, bitrate = '') { const item = document.createElement('li'); item.className = `menu-item ${isActive ? 'active' : ''}`; item.innerHTML = `<span class="menu-item-bitrate">${bitrate}</span> <span>${title}</span> <span class="checkmark" data-feather="check"></span>`; item.onclick = action; return item; }  
-player.addEventListener('audiolanguagechanged', showMainMenu);  
-player.addEventListener('variantchanged', showMainMenu);  
-elements.video.addEventListener('ratechange', showMainMenu);  
-elements.video.addEventListener('play', () => { updatePlayButton(); showControls(); });  
-elements.video.addEventListener('pause', () => { updatePlayButton(); showControls(); });  
-elements.video.addEventListener('volumechange', updateMuteButton);  
-elements.playerContainer.addEventListener('mousemove', showControls);  
-elements.playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });  
-elements.playPauseCenterBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });  
-elements.seekBackwardBtn.addEventListener('click', (e) => { e.stopPropagation(); elements.video.currentTime -= 10; });  
-elements.seekForwardBtn.addEventListener('click', (e) => { e.stopPropagation(); elements.video.currentTime += 10; });  
-elements.muteBtn.addEventListener('click', (e) => { e.stopPropagation(); elements.video.muted = !elements.video.muted; });  
-elements.fullscreenBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });  
-elements.expandBtn.addEventListener('click', (e) => { e.stopPropagation(); expandModeIndex = (expandModeIndex + 1) % expandModes.length; elements.video.style.objectFit = expandModes[expandModeIndex]; });  
-document.addEventListener('fullscreenchange', updateFullscreenIcon);  
-elements.video.addEventListener('timeupdate', () => { if (player.isLive() && (player.seekRange().end - player.seekRange().start < 60)) { elements.timeDisplay.innerHTML = `<span style="color: var(--live-color); font-weight: bold;">●</span> مباشر`; } else { const range = player.seekRange(); if (isFinite(range.end) && range.end > 0) { elements.timeDisplay.textContent = `${formatTime(elements.video.currentTime)}`; } } });  
-elements.settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSettingsPopup(); });  
-elements.settingsCloseBtn.addEventListener('click', toggleSettingsPopup);  
-elements.settingsBackBtn.addEventListener('click', showMainMenu);  
-player.addEventListener('error', (event) => { console.error('Shaka Player Error:', event.detail); showError('حدث خطأ في المشغل', `فشل تشغيل البث. (خطأ ${event.detail.code})`); });  
-player.addEventListener('buffering', e => { elements.loadingSpinner.style.display = e.buffering ? 'block' : 'none'; });  
-
-initializeApp();
-
-});
+function back(){
+    document.getElementById("sections").style.display="grid";
+    document.getElementById("channels").style.display="none";
+}
+let slides=document.querySelectorAll(".slider-slide");
+let i=0;
+setInterval(()=>{
+    slides[i].classList.remove("active");
+    i=(i+1)%slides.length;
+    slides[i].classList.add("active");
+},3000);
 </script>
-
-</body>  
-</html> 
+</body>
+</html>
